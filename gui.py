@@ -8,7 +8,7 @@ from image_processing import load_image, image_to_pattern
 class ARTApp:
     def __init__(self, master):
         self.master = master
-        master.title("ART Image Classifier")
+        master.title("Clasificador de Imagenes ART")
 
         self.model = ART1(num_features=10000, vigilance=0.5)
 
@@ -32,13 +32,13 @@ class ARTApp:
         self.modify_frame = tk.Frame(master)
         self.modify_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
 
-        self.upload_button = tk.Button(self.control_frame, text="Upload Image", command=self.upload_image)
+        self.upload_button = tk.Button(self.control_frame, text="Subir imagen", command=self.upload_image)
         self.upload_button.pack()
 
-        self.classify_button = tk.Button(self.control_frame, text="Classify Image", command=self.classify_image)
+        self.classify_button = tk.Button(self.control_frame, text="Clasificar", command=self.classify_image)
         self.classify_button.pack()
 
-        self.reload_button = tk.Button(self.control_frame, text="Reload Modified Image", command=self.reload_image)
+        self.reload_button = tk.Button(self.control_frame, text="Re-subir imagen", command=self.reload_image)
         self.reload_button.pack()
 
         self.result_label = tk.Label(self.control_frame, text="")
@@ -68,7 +68,7 @@ class ARTApp:
             self.image = self.modified_image.copy()
             self.pattern = image_to_pattern(self.image)
             self.show_image(self.image, self.image_label)
-            messagebox.showinfo("Reload Image", "Modified image reloaded successfully.")
+            messagebox.showinfo("Cargar la imagen nuevamente", "Se modifico la imagen exitosamente")
         else:
             messagebox.showerror("Error", "No modified image available to reload.")
 
@@ -85,10 +85,10 @@ class ARTApp:
             if classification == -1:
                 self.model.train([self.pattern])
                 classification = len(self.model.weights) - 1
-            pokemon_name = self.class_to_pokemon.get(classification, "Unknown")
-            self.result_label.config(text=f"Image classified as {pokemon_name}")
+            pokemon_name = self.class_to_pokemon.get(classification, "Desconocido")
+            self.result_label.config(text=f"Imagen clasificada como {pokemon_name}")
         else:
-            messagebox.showerror("Error", "No image uploaded")
+            messagebox.showerror("Error", "Ninguna imagen se subió")
 
     def modify_pixel(self, event):
         if hasattr(self, 'modified_image'):
