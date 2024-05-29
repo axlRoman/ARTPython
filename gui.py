@@ -12,13 +12,17 @@ class ARTApp:
 
         self.model = ART1(num_features=10000, vigilance=0.8)
 
-        # Frame for image
+        # Frame for original image
         self.image_frame = tk.Frame(master)
         self.image_frame.pack(side=tk.LEFT)
 
-        # Frame for buttons and results
+        # Frame for controls and results
         self.control_frame = tk.Frame(master)
-        self.control_frame.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
+        self.control_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+
+        # Frame for modified image
+        self.modify_frame = tk.Frame(master)
+        self.modify_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
 
         self.upload_button = tk.Button(self.control_frame, text="Upload Image", command=self.upload_image)
         self.upload_button.pack()
@@ -26,26 +30,46 @@ class ARTApp:
         self.classify_button = tk.Button(self.control_frame, text="Classify Image", command=self.classify_image)
         self.classify_button.pack()
 
+        self.reload_button = tk.Button(self.control_frame, text="Reload Modified Image", command=self.reload_image)
+        self.reload_button.pack()
+
         self.result_label = tk.Label(self.control_frame, text="")
         self.result_label.pack()
 
         self.image_label = tk.Label(self.image_frame)
         self.image_label.pack()
 
+        self.modify_image_label = tk.Label(self.modify_frame)
+        self.modify_image_label.pack()
+
+        # Add mouse click and drag events to the modified image
+        self.modify_image_label.bind("<Button-1>", self.modify_pixel)
+        self.modify_image_label.bind("<B1-Motion>", self.modify_pixel)
+
     def upload_image(self):
         file_path = filedialog.askopenfilename()
         if file_path:
             self.image = load_image(file_path)
             self.pattern = image_to_pattern(self.image)
-            self.show_image(self.image)
+            self.show_image(self.image, self.image_label)
+            self.modified_image = self.image.copy()
+            self.show_image(self.modified_image, self.modify_image_label)
 
-    def show_image(self, image):
-        # Convert the numpy array to an Image object and then to PhotoImage
+    def reload_image(self):
+        if hasattr(self, 'modified_image'):
+            self.image = self.modified_image.copy()
+            self.pattern = image_to_pattern(self.image)
+            self.show_image(self.image, self.image_label)
+            messagebox.showinfo("Reload Image", "Modified image reloaded successfully.")
+        else:
+            messagebox.showerror("Error", "No modified image available to reload.")
+
+    def show_image(self, image, label):
         image_pil = Image.fromarray(image)
-        image_tk = ImageTk.PhotoImage(image_pil)
-        
-        self.image_label.config(image=image_tk)
-        self.image_label.image = image_tk  # Keep a reference to avoid garbage collection
+        scaled_image_pil = image_pil.resize((500, 500), Image.NEAREST)  # Escalar la imagen para visualización
+        image_tk = ImageTk.PhotoImage(scaled_image_pil)
+        label.config(image=image_tk)
+        label.image = image_tk  # Keep a reference to avoid garbage collection
 
     def classify_image(self):
         if hasattr(self, 'pattern'):
@@ -56,3 +80,15 @@ class ARTApp:
             self.result_label.config(text=f"Image classified as class {classification}")
         else:
             messagebox.showerror("Error", "No image uploaded")
+
+    def modify_pixel(self, event):
+        if hasattr(self, 'modified_image'):
+            x = event.x * 100 // self.modify_image_label.winfo_width()
+            y = event.y * 100 // self.modify_image_label.winfo_height()
+            if 0 <= x < 100 and 0 <= y < 100:  # Ensure x and y are within bounds
+                self.modified_image[y, x] = 255 if self.modified_image[y, x] == 0 else 0
+                self.show_image(self.modified_image, self.modify_image_label)
+
+root = tk.Tk()
+app = ARTApp(root)
+root.mainloop()

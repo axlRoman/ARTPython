@@ -7,4 +7,4 @@ def load_image(path):
     return binary_image
 
 def image_to_pattern(image):
-    return image.flatten() / 255
+    return (image // 255).flatten()
