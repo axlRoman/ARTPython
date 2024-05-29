@@ -10,7 +10,15 @@ class ARTApp:
         self.master = master
         master.title("ART Image Classifier")
 
-        self.model = ART1(num_features=10000, vigilance=0.8)
+        self.model = ART1(num_features=10000, vigilance=0.5)
+
+        # Mapeo de números de clase a nombres de Pokémon
+        self.class_to_pokemon = {
+            0: "Bulbasaur",
+            1: "Charmander",
+            2: "Squirtle"
+            # Agrega más entradas según sea necesario
+        }
 
         # Frame for original image
         self.image_frame = tk.Frame(master)
@@ -77,7 +85,8 @@ class ARTApp:
             if classification == -1:
                 self.model.train([self.pattern])
                 classification = len(self.model.weights) - 1
-            self.result_label.config(text=f"Image classified as class {classification}")
+            pokemon_name = self.class_to_pokemon.get(classification, "Unknown")
+            self.result_label.config(text=f"Image classified as {pokemon_name}")
         else:
             messagebox.showerror("Error", "No image uploaded")
 
