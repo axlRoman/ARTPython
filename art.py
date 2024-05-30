@@ -16,10 +16,11 @@ class ART1:
             return
 
         for weight in self.weights:
-            match = np.sum(np.minimum(weight, pattern)) / np.sum(pattern)
-            if match >= self.vigilance:
-                self._update_weight(weight, pattern)
-                return
+            if len(weight) == len(pattern):
+                match = np.sum(np.minimum(weight, pattern)) / np.sum(pattern)
+                if match >= self.vigilance:
+                    self._update_weight(weight, pattern)
+                    return
 
         self.weights.append(pattern)
 
@@ -28,8 +29,8 @@ class ART1:
 
     def predict(self, pattern):
         for i, weight in enumerate(self.weights):
-            match = np.sum(np.minimum(weight, pattern)) / np.sum(pattern)
-            if match >= self.vigilance:
-                return i
+            if len(weight) == len(pattern):
+                match = np.sum(np.minimum(weight, pattern)) / np.sum(pattern)
+                if match >= self.vigilance:
+                    return i
         return -1
-
