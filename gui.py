@@ -92,7 +92,7 @@ class ARTApp:
             self.show_image(self.image, self.modify_image_label)
             messagebox.showinfo("Cargar la imagen nuevamente", "Se modifico la imagen exitosamente")
         else:
-            messagebox.showerror("Error", "No modified image available to reload.")
+            messagebox.showerror("Error", "No existe imagen modificada para subir")
 
     def show_image(self, image, label):
         image_pil = Image.fromarray(image)
